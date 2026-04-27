@@ -4,7 +4,7 @@ import { IGeminiParsedData } from '../types';
 import { logger } from '../utils/logger';
 
 // Using Gemini Developer API SDK (Google GenAI)
-const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+// NOTE: Client is created inside the function to ensure env vars are read at call time
 
 const SYSTEM_PROMPT = `Ты — эксперт-сметчик и парсер данных. Твоя задача — извлечь точные численные значения из предоставленного документа по натяжным потолкам.
 ВАЖНОЕ ПРАВИЛО ПАРСИНГА: В исходном документе названия профилей и систем (EUROKRAAB, LumFer Volat, LumFer PDK60, LumFer BP03, Flexy Shtorka и другие) могут быть разорваны символами переноса строки (\\n). Тебе запрещено игнорировать такие позиции. Ты обязан логически склеивать текст, игнорируя переносы строк внутри названия, и обязательно извлекать все профили в итоговый ответ.
@@ -64,14 +64,23 @@ const RESPONSE_SCHEMA: Schema = {
 };
 
 export async function parsePdfWithGemini(fileBuffer: Buffer, fileName: string): Promise<IGeminiParsedData> {
-  try {
-    logger.info({ context: 'GeminiService', message: 'Starting PDF parsing with Gemini (inline mode)', fileName });
+  // Читаем ключ в момент вызова, а не при инициализации модуля
+  const apiKey = process.env.GEMINI_API_KEY || env.GEMINI_API_KEY || '';
+  logger.info({ context: 'GeminiService', message: `Starting PDF parsing with Gemini (inline mode), key present: ${!!apiKey}`, fileName });
 
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY is not set in environment variables');
+  }
+
+  // Создаём клиент здесь, чтобы гарантированно получить актуальный ключ
+  const ai = new GoogleGenAI({ apiKey });
+
+  try {
     // Используем инлайн Base64 вместо Files API — работает из любого региона
     const base64Data = fileBuffer.toString('base64');
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       contents: [
         {
           inlineData: {
