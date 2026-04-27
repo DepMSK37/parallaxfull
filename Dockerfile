@@ -5,11 +5,14 @@ WORKDIR /usr/src/app
 
 # Copy root package.json and install dependencies
 COPY package*.json ./
-# This will also trigger the postinstall script to install smeta dependencies
-RUN npm install
+# Ignore scripts to prevent postinstall from failing before modules are copied
+RUN npm install --ignore-scripts
 
 # Copy all files
 COPY . .
+
+# Run postinstall manually now that the modules folder exists
+RUN npm run postinstall
 
 # Create directory for SQLite databases
 RUN mkdir -p data
