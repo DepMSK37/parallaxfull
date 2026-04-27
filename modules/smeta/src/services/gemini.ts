@@ -64,16 +64,21 @@ const RESPONSE_SCHEMA: Schema = {
 };
 
 export async function parsePdfWithGemini(fileBuffer: Buffer, fileName: string): Promise<IGeminiParsedData> {
-  // Читаем ключ в момент вызова, а не при инициализации модуля
+  // Читаем ключ и прокси в момент вызова, а не при инициализации модуля
   const apiKey = process.env.GEMINI_API_KEY || env.GEMINI_API_KEY || '';
-  logger.info({ context: 'GeminiService', message: `Starting PDF parsing with Gemini (inline mode), key present: ${!!apiKey}`, fileName });
+  const proxyUrl = process.env.GEMINI_PROXY_URL || env.GEMINI_PROXY_URL || '';
+
+  logger.info({ context: 'GeminiService', message: `Starting PDF parsing with Gemini (inline mode), key present: ${!!apiKey}, proxy: ${proxyUrl ? 'enabled' : 'disabled'}`, fileName });
 
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not set in environment variables');
   }
 
-  // Создаём клиент здесь, чтобы гарантированно получить актуальный ключ
-  const ai = new GoogleGenAI({ apiKey });
+  // Если задан прокси — все запросы идут через него (обход гео-блокировки)
+  const ai = new GoogleGenAI({
+    apiKey,
+    ...(proxyUrl ? { httpOptions: { baseUrl: proxyUrl } } : {}),
+  });
 
   try {
     // Используем инлайн Base64 вместо Files API — работает из любого региона
