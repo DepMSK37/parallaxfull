@@ -12,16 +12,16 @@ function validateEnv(): Env {
   const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 
   if (!TELEGRAM_BOT_TOKEN) {
-    throw new Error('Missing TELEGRAM_BOT_TOKEN in environment variables.');
+    console.warn('[Smeta] Warning: Missing TELEGRAM_BOT_TOKEN (not needed if running inside Parallax)');
   }
 
   if (!GEMINI_API_KEY) {
-    throw new Error('Missing GEMINI_API_KEY in environment variables.');
+    console.warn('[Smeta] Warning: Missing GEMINI_API_KEY in environment variables. Smeta module will fail to parse PDFs.');
   }
 
   return {
-    TELEGRAM_BOT_TOKEN,
-    GEMINI_API_KEY,
+    TELEGRAM_BOT_TOKEN: TELEGRAM_BOT_TOKEN || '',
+    GEMINI_API_KEY: GEMINI_API_KEY || '',
     LOG_LEVEL,
   };
 }
