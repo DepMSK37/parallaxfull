@@ -11,8 +11,11 @@ RUN npm install --ignore-scripts
 # Copy all files
 COPY . .
 
-# Run postinstall manually now that the modules folder exists
-RUN npm run postinstall
+# Install smeta module dependencies
+RUN cd modules/smeta && npm install
+
+# Install accounting module dependencies (better-sqlite3 needs to be local for ESM dynamic import)
+RUN cd modules/accounting && npm install
 
 # Create directory for SQLite databases
 RUN mkdir -p data

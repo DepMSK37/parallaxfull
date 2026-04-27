@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node parallax.js",
     "dev": "node --watch parallax.js",
-    "postinstall": "cd modules/smeta && npm install"
+    "postinstall": "cd modules/smeta && npm install && cd ../accounting && npm install"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0",
