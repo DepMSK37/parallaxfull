@@ -71,7 +71,7 @@ export async function parsePdfWithGemini(fileBuffer: Buffer, fileName: string): 
     const base64Data = fileBuffer.toString('base64');
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash',
       contents: [
         {
           inlineData: {

@@ -67,7 +67,7 @@ async function parsePdfWithGemini(fileBuffer, fileName) {
         // Используем инлайн Base64 вместо Files API — работает из любого региона
         const base64Data = fileBuffer.toString('base64');
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-1.5-flash',
             contents: [
                 {
                     inlineData: {
