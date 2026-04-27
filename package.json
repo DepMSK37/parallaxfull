@@ -6,7 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "start": "node parallax.js",
-    "dev": "node --watch parallax.js"
+    "dev": "node --watch parallax.js",
+    "postinstall": "cd modules/smeta && npm install"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0",
